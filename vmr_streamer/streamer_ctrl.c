@@ -1361,7 +1361,7 @@ static void DrawBUS_Monitor(LPT_VMSCTL_BUSCTX lpobject, HDC dc)
 	HPEN oldpen;
 	HBRUSH oldbrush;
 	if (dc == NULL) return;
-
+	lpobject->data.bus_fMonitorSupport = 0;	//Ragnar
 	if (lpobject->data.bus_fMonitorSupport == 0) return;
 	
 	rect.right = lpobject->dx-VMSCTL_STRIPBUS_MARGIN;

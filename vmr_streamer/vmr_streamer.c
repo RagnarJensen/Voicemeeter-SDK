@@ -1459,7 +1459,11 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 	mask = VMRS_BITBUS;
 	for (vi=0;vi<lpapp->vbvmr_nbbus; vi++)
 	{
-		lpp->bus[vi].bus_fMonitorSupport = lpapp->vbvmr_monitor_support;
+		// lpp->bus[vi].bus_fMonitorSupport = lpapp->vbvmr_monitor_support;
+		// Ragnar
+		lpapp->vbvmr_monitor_support = 0;
+		lpp->bus[vi].bus_fMonitorSupport = 0;
+		// End Ragnar
 		strcpy(lpp->bus[vi].bus_nickname,lpapp->vbvmr_pBUSName[vi]);
 		// bus label
 		rep = GetCurrentBusLabel(vi, wszString);
@@ -1488,7 +1492,8 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 			lpp->bus[vi].bus_gain = fff;
 		}
 		// BUS SEL 
-		if (lpapp->vbvmr_multilayer != 0)
+		// Ragnar
+		/* if (lpapp->vbvmr_multilayer != 0)
 		{
 			rep=GetCurrentBusSel(vi, &fff);
 			if (rep >= 0)
@@ -1497,10 +1502,14 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 				{
 					updatebit |= mask;
 				}
-				lpp->bus[vi].bus_monitor = (long)fff;
+				// lpp->bus[vi].bus_monitor = (long)fff;
+				lpp->bus[vi].bus_monitor = 0;
 			}
 		}
+		
 		else lpp->bus[vi].bus_monitor=0;
+		*/
+		lpp->bus[vi].bus_monitor = 0; // Ragnar
 		// Bus Mute
 		rep=GetCurrentBusMute(vi, &fff);
 		if (rep >= 0)
@@ -1512,7 +1521,7 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 			lpp->bus[vi].bus_mute = (long)fff;
 		}
 		// Bus Monitor
-		rep=GetCurrentBusMonitor(vi, &fff);
+		/* rep = GetCurrentBusMonitor(vi, &fff);
 		if (rep >= 0)
 		{
 			if ((fff != 0.0f) && (monitorbus < 0))
@@ -1520,6 +1529,7 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 				monitorbus = vi;
 			}
 		}
+		*/
 
 		mask=mask<<1;
 	}
@@ -1539,7 +1549,8 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 			if (lpp->bus[vi].bus_monitor != 0) nu++;
 		}
 		//otherwise we consider there is no monitoring
-		if (nu > 1)
+		// Ragnar
+		/* if (nu > 1)
 		{
 			mask = VMRS_BITBUS;
 			for (vi=0;vi<lpapp->vbvmr_nbbus; vi++)
@@ -1549,6 +1560,8 @@ static long AnalyseParamChange(LPT_APP_CONTEXT lpapp)
 			}
 			mask=mask<<1;
 		}
+		*/
+		
 	}
 	//
 	//get parameters for strips
@@ -1850,6 +1863,10 @@ void DrawAllStuff(LPT_APP_CONTEXT lpapp, HWND hw, HDC dc)
 		strcpy(sss,"OUTPUT BUS");
 		Rectangle(dc,rect.left,rect.top,rect.right,rect.bottom);
 		DrawText(dc,sss,(long)strlen(sss),&rect,DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+		// Ragnar
+		lpapp->vbvmr_monitor_support = 0;
+		// END Ragnar
+
 		if (lpapp->vbvmr_multilayer != 0)
 		{
 			rect.left = rect.right - 110;
@@ -1965,11 +1982,15 @@ long DetectVoicemeeterType(LPT_APP_CONTEXT lpapp, HWND hw)
 				{
 					// we activate the Monitor on SEL option
 					strcpy(szParam,"Option.MonitorOnSEL");
+					rep = SendParameterToVoicemeeter(szParam, 0.0f);    //Ragnar
+					/* Ragnar
 					rep=SendParameterToVoicemeeter(szParam, 1.0f);
 					if (rep >= 0)
 					{
-						lpapp->vbvmr_monitor_support=1;
+						lpapp->vbvmr_monitor_support=0;
 					}
+					*/
+					lpapp->vbvmr_monitor_support = 0;
 				}
 				break;
 			}
@@ -2752,6 +2773,7 @@ int APIENTRY WinMain(HINSTANCE handle_app,			//Application hinstance.
 	}
 	ShowWindow(hh,SW_SHOW);				//Display the window.
 	UpdateWindow(hh);					//Send WM_PAINT.
+
 	/*---------------------------------------------------------------------------*/
 	/*                             Messages Loop.                                */
 	/*---------------------------------------------------------------------------*/
